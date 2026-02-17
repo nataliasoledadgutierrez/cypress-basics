@@ -16,7 +16,7 @@ describe('Locators', () => {
   })
 
 
-    it('Type of locators', () => {
+    it('Types of locators', () => {
         
         //Localizador por tagname
         cy.get('textarea')
