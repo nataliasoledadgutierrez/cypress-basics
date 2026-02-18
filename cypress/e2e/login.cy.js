@@ -2,40 +2,47 @@ import LoginPage from '../pages/LoginPage'
 
 describe('Login Flow - OrangeHRM', () => {
 
-    beforeEach(() => {
-        LoginPage.visit()
-    })
-    
-    it('should login with valid credentials', () => {
+  beforeEach(() => {
+    LoginPage.visit()
+  })
 
-        LoginPage.enterUsername('Admin')
-        LoginPage.enterPassword('admin123')
-        LoginPage.clickLogin()
+  it('should login with valid credentials', () => {
 
-        cy.url().should('include', '/dashboard')
-    })
+    cy.intercept('POST', '**/auth/**').as('loginRequest')
 
-    it('should login with invalid password', () => {
+    LoginPage.enterUsername('Admin')
+    LoginPage.enterPassword('admin123')
+    LoginPage.clickLogin()
 
-        cy.intercept('POST', '**/auth/**').as('loginRequest')
+    cy.wait('@loginRequest')
+      .its('response.statusCode')
+      .should('eq', 302)
 
-        LoginPage.enterUsername('Admin')
-        LoginPage.enterPassword('Naty1234')
-        LoginPage.clickLogin()
+    cy.url().should('include', '/dashboard')
 
-        /*cy.wait('@loginRequest').its('response.statusCode').should('eq', 302)
+    cy.get('.oxd-userdropdown-name')
+      .should('be.visible')
+      .and('not.be.empty')
 
-        cy.wait('@loginRequest').then((interception) => {
-            console.log(interception)
-          })*/
-        cy.wait('@loginRequest').then((interception) => {
-            expect(interception.response.statusCode).to.eq(302)
-            console.log(interception)
-        })
-              
-          
+  })
 
-        cy.contains('Invalid credentials').should('be.visible')
-    })
+  it('should login with invalid password', () => {
+
+    cy.intercept('POST', '**/auth/**').as('loginRequest')
+
+    LoginPage.enterUsername('Admin')
+    LoginPage.enterPassword('Naty1234')
+    LoginPage.clickLogin()
+
+    cy.wait('@loginRequest')
+      .its('response.statusCode')
+      .should('eq', 302)
+
+    cy.url().should('include', '/auth/login')
+
+    cy.contains('Invalid credentials')
+      .should('be.visible')
+
+  })
 
 })
