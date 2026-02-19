@@ -15,3 +15,11 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+
+//Para entorno inestable como este demo,
+//podemos evitar que Cypress falle por errores de aplicación:
+
+//Cypress.on('uncaught:exception', (err, runnable) => {
+   // return false
+  //})
+  
