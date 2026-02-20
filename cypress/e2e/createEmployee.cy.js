@@ -26,10 +26,22 @@ describe('Create Employee Flow - OrangeHRM', () => {
       AddEmployeePage.enterFirstName(firstName)
       AddEmployeePage.enterLastName(lastName)
       AddEmployeePage.enterEmployeeId(employeeId)
+
+      cy.intercept('POST', '**/pim/employees').as('createEmployee')
   
       AddEmployeePage.clickSave()
+
+       // Valido backend
+     cy.wait('@createEmployee')
+     .its('response.statusCode')
+     .should('be.oneOf', [200, 201])
   
-      cy.contains(firstName).should('be.visible')
+      // Valido redirección correcta
+    cy.url().should('include', 'viewPersonalDetails')
+
+      // Valido persistencia real
+    cy.get('input[name="firstName"]')
+    .should('have.value', firstName)
   
     })
   
